@@ -28,12 +28,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import co.anbora.labs.spatia.geometry.Point
-import co.anbora.labs.spatiaroom.data.model.PtAmenity.Companion.TABLE_NAME
+import co.anbora.labs.spatiaroom.data.model.PtAmenity.Companion.TABLE_NAME_ENTITY
 
 /**
  * Data class for Database entity and Serialization.
  */
-@Entity(tableName = TABLE_NAME)
+@Entity(tableName = TABLE_NAME_ENTITY)
 data class PtAmenity(
 
     @PrimaryKey
@@ -68,5 +68,6 @@ data class PtAmenity(
 ) {
     companion object {
         const val TABLE_NAME = "amenity_internet_cafe_lisboa"
+        const val TABLE_NAME_ENTITY = "amenity_internet_cafe_lisboa_2"
     }
 }

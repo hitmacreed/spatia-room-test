@@ -52,7 +52,7 @@ interface AmenitiesDao {
     /**
      * Deletes all the amenities from the [PtAmenity.TABLE_NAME] table.
      */
-    @Query("DELETE FROM ${PtAmenity.TABLE_NAME}")
+    @Query("DELETE FROM ${PtAmenity.TABLE_NAME_ENTITY}")
     fun deleteAllAmenities()
 
     /**
@@ -60,7 +60,7 @@ interface AmenitiesDao {
      * @param ogc_fid Unique ID of [PtAmenity]
      * @return  [PtAmenity] from database table.
      */
-    @Query("SELECT * FROM ${PtAmenity.TABLE_NAME} WHERE ogc_fid = :id")
+    @Query("SELECT * FROM ${PtAmenity.TABLE_NAME_ENTITY} WHERE ogc_fid = :id")
     @SkipQueryVerification
     fun getAmenityById(id: Int): PtAmenity
 
@@ -78,7 +78,7 @@ interface AmenitiesDao {
      * Fetches all the amenities from the [PtAmenity.TABLE_NAME] table.
      * @return [Flow]
      */
-    @Query("SELECT * FROM ${PtAmenity.TABLE_NAME}")
+    @Query("SELECT * FROM ${PtAmenity.TABLE_NAME_ENTITY}")
     fun getAllAmenity(): List<PtAmenity>
 
 
