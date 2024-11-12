@@ -2,17 +2,18 @@ package co.anbora.labs.spatiaroom.data
 
 
 import android.content.Context
+import android.widget.Toast
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import co.anbora.labs.spatia.builder.SpatiaRoom
 import co.anbora.labs.spatia.geometry.GeometryConverters
 import co.anbora.labs.spatiaroom.data.dao.AmenitiesDao
+import co.anbora.labs.spatiaroom.data.helper.DatabaseMigrationHelper
 import co.anbora.labs.spatiaroom.data.model.PtAmenity
-import co.anbora.labs.spatiaroom.data.model.PtAmenity.Companion.TABLE_NAME
-import co.anbora.labs.spatiaroom.data.model.PtAmenity.Companion.TABLE_NAME_ENTITY
+import java.io.File
+
 
 @Database(
     entities = [PtAmenity::class],
@@ -29,7 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DB_NAME = "cafesSpatiaLite.sqlite";
-        const val ASSET_PATH = "database/" + DB_NAME;
+        const val  DB_FOLDER_NAME = "databases"
 
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -40,79 +41,62 @@ abstract class AppDatabase : RoomDatabase() {
                 return tempInstance
             }
 
+            // Get external files directory
+            val baseDir = context.getExternalFilesDir(null)
+
+            // Create a "databases" directory within the external files directory
+            val databasesDir = File(baseDir, DB_FOLDER_NAME)
+
+            if (!databasesDir.exists()) {
+                // Create the "databases" directory if it doesn't already exist
+                val dirCreated = databasesDir.mkdirs()
+                if (!dirCreated) {
+                    throw RuntimeException("Failed to create 'databases' directory.")
+                }
+            }
+
+            // Get the external file path for the database
+            val dbFile = File(databasesDir, DB_NAME)
+
+            // Check if the database file exists
+            if (!dbFile.exists()) {
+                // Alert the user that the file is missing and return without initializing Room
+                Toast.makeText(
+                    context,
+                    "Database file not found. Please create the file at: " + dbFile.path,
+                    Toast.LENGTH_LONG
+                ).show()
+                // Throw an exception to stop execution without returning an instance
+                throw IllegalStateException("Database file not found.")
+            }
+
+
             synchronized(this) {
                 val instance = SpatiaRoom.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     DB_NAME,
-                ).createFromAsset(ASSET_PATH)
+                ).createFromFile(dbFile)
                     .addCallback(object : Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        db.beginTransaction()
-                        try {
-                            // Initialize metadata spatialite
-                            db.query("SELECT InitSpatialMetaData();").moveToNext()
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            db.beginTransaction()
+                            try {
+                                // Initialize metadata spatialite
+                                db.query("SELECT InitSpatialMetaData();").moveToNext()
+                                DatabaseMigrationHelper.createNewAmenityTable(db)
+                                DatabaseMigrationHelper.addGeometryColumn(db)
+                                DatabaseMigrationHelper.createSpatialIndex(db)
+                                DatabaseMigrationHelper.migrateDataFromOldTable(db)
+                                DatabaseMigrationHelper.dropOldTables(db)
+                                DatabaseMigrationHelper.renameNewTable(db)
 
-// Create a temp table with blob column geometry
-                            db.execSQL("""
-    CREATE TABLE "amenity_internet_cafe_lisboa_2_new" (
-        "ogc_fid" INTEGER, 
-        "full_id" TEXT, 
-        "osm_id" TEXT, 
-        "osm_type" TEXT, 
-        "amenity" TEXT, 
-        "wheelchair" TEXT, 
-        "opening_hours" TEXT, 
-        "name" TEXT, 
-        "internet_access" TEXT, 
-        "GEOMETRY" BLOB, 
-        PRIMARY KEY("ogc_fid")
-    )
-""")
+                                } finally {
+                                db.setTransactionSuccessful()
+                            }
 
-// Add geometry column
-                            db.query("""
-    SELECT AddGeometryColumn(
-        'amenity_internet_cafe_lisboa_2_new', 
-        'GEOMETRY', 
-        4326, 
-        'POINT', 
-        'XY'
-    );
-""").moveToNext()
-
-// Create spatial index for column GEOMETRY
-                            db.query("""
-    SELECT CreateSpatialIndex(
-        'amenity_internet_cafe_lisboa_2_new', 
-        'GEOMETRY'
-    );
-""").moveToNext()
-
-// Insert data from old table
-                            db.execSQL("""
-    INSERT INTO "amenity_internet_cafe_lisboa_2_new" 
-    SELECT "ogc_fid", "full_id", "osm_id", "osm_type", "amenity", "wheelchair", "opening_hours", "name", "internet_access", "GEOMETRY" 
-    FROM "amenity_internet_cafe_lisboa"
-""")
-
-                            // Delete old table with data
-                            db.execSQL("DROP TABLE IF EXISTS `amenity_internet_cafe_lisboa`")
-                            // Delete old table created by room entity
-                            db.execSQL("DROP TABLE IF EXISTS `amenity_internet_cafe_lisboa_2`")
-
-// Rename new table
-                            db.execSQL("""
-    ALTER TABLE "amenity_internet_cafe_lisboa_2_new" 
-    RENAME TO "amenity_internet_cafe_lisboa_2"
-""")
-                        } finally {
-                            db.setTransactionSuccessful()
+                            db.endTransaction()
                         }
-
-                        db.endTransaction()
-                    }
-                })
+                    })
                     .build()
 
                 INSTANCE = instance

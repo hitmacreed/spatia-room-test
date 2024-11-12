@@ -67,7 +67,6 @@ data class PtAmenity(
     var geometry: Point?,
 ) {
     companion object {
-        const val TABLE_NAME = "amenity_internet_cafe_lisboa"
         const val TABLE_NAME_ENTITY = "amenity_internet_cafe_lisboa_2"
     }
 }
