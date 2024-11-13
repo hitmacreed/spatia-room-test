@@ -28,45 +28,42 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import co.anbora.labs.spatia.geometry.Point
-import co.anbora.labs.spatiaroom.data.model.PtAmenity.Companion.TABLE_NAME_ENTITY
+import co.anbora.labs.spatiaroom.data.model.PtAddresses.Companion.TABLE_NAME_ENTITY
 
 /**
  * Data class for Database entity and Serialization.
  */
 @Entity(tableName = TABLE_NAME_ENTITY)
-data class PtAmenity(
+data class PtAddresses(
 
     @PrimaryKey
-    @ColumnInfo(name = "ogc_fid")
+    @ColumnInfo(name = "id")
     var id: Long?,
 
-    @ColumnInfo(name = "full_id")
-    var fullId: String? = null,
+    @ColumnInfo(name = "country")
+    var country: String? = null,
 
-    @ColumnInfo(name = "osm_id")
-    var osmId: String?,
+    @ColumnInfo(name = "city")
+    var city: String?,
 
-    @ColumnInfo(name = "osm_type")
-    var osmType: String?,
-
-    @ColumnInfo(name = "amenity")
-    var amenity: String?,
+    @ColumnInfo(name = "postcode")
+    var postcode: String?,
 
     var wheelchair : String?,
 
-    @ColumnInfo(name = "opening_hours")
-    var openingHours: String?,
+    @ColumnInfo(name = "street")
+    var street: String?,
 
-    var name: String?,
+    @ColumnInfo(name = "housename")
+    var housename: String?,
 
-    @ColumnInfo(name = "internet_access")
-    var internetAccess: String?,
+    @ColumnInfo(name = "housenumber")
+    var housenumber: String?,
 
-
-    @ColumnInfo(name = "GEOMETRY")
+    @ColumnInfo(name = "Geometry")
     var geometry: Point?,
 ) {
     companion object {
-        const val TABLE_NAME_ENTITY = "amenity_internet_cafe_lisboa_2"
+        const val TABLE_NAME_ENTITY = "pt_addresses_cp"
     }
 }

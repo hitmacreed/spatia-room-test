@@ -9,14 +9,14 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import co.anbora.labs.spatia.builder.SpatiaRoom
 import co.anbora.labs.spatia.geometry.GeometryConverters
-import co.anbora.labs.spatiaroom.data.dao.AmenitiesDao
+import co.anbora.labs.spatiaroom.data.dao.AddressesDao
 import co.anbora.labs.spatiaroom.data.helper.DatabaseMigrationHelper
-import co.anbora.labs.spatiaroom.data.model.PtAmenity
+import co.anbora.labs.spatiaroom.data.model.PtAddresses
 import java.io.File
 
 
 @Database(
-    entities = [PtAmenity::class],
+    entities = [PtAddresses::class],
     version = 1,
     //exportSchema = false
 )
@@ -24,12 +24,12 @@ import java.io.File
 abstract class AppDatabase : RoomDatabase() {
 
     /**
-     * @return [AmenitiesDao] Foodium Posts Data Access Object.
+     * @return [AddressesDao] Foodium Posts Data Access Object.
      */
-    abstract fun getAmenity(): AmenitiesDao
+    abstract fun addresses(): AddressesDao
 
     companion object {
-        const val DB_NAME = "cafesSpatiaLite.sqlite";
+        const val DB_NAME = "lisbonSpatiaLite.sqlite";
         const val  DB_FOLDER_NAME = "databases"
 
         @Volatile
@@ -83,10 +83,10 @@ abstract class AppDatabase : RoomDatabase() {
                             try {
                                 // Initialize metadata spatialite
                                 db.query("SELECT InitSpatialMetaData();").moveToNext()
-                                DatabaseMigrationHelper.createNewAmenityTable(db)
+                                DatabaseMigrationHelper.createNewAddressesTable(db)
                                 DatabaseMigrationHelper.addGeometryColumn(db)
                                 DatabaseMigrationHelper.createSpatialIndex(db)
-                                DatabaseMigrationHelper.migrateDataFromOldTable(db)
+                                DatabaseMigrationHelper.migrateDataFromOriginalTable(db)
                                 DatabaseMigrationHelper.dropOldTables(db)
                                 DatabaseMigrationHelper.renameNewTable(db)
 

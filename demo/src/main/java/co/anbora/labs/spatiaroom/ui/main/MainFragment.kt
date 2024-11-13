@@ -43,16 +43,41 @@ class MainFragment : Fragment() {
 
         appDatabase = AppDatabase.getInstance(requireContext())
 
-        val spatia_version = view?.findViewById<TextView>(R.id.spatia_version)
+        val pt_address = view?.findViewById<TextView>(R.id.address)
 
         uiScope.launch(Dispatchers.IO) {
 
-            val spatiaVersion = appDatabase.getAmenity().getSpatiaVersion()
-            val getAmenity = appDatabase.getAmenity().getAmenityById(1);
-            // Log the fetched amenity
-            Log.d("AmenityLog", "Fetched amenity: $getAmenity")
+            val spatiaVersion = appDatabase.addresses().getSpatiaVersion()
+            val address = appDatabase.addresses().getAddressesByCityAndStreet("Lisboa", "Rua do Açúcar")
+            val stDistanceTest = appDatabase.addresses().stDistanceTest()
+            val makePolygonTest = appDatabase.addresses().makePolygonTest()
+            val getNearbyAddresses = appDatabase.addresses().getNearbyAddresses()
+            // Log the fetched address and spatialite version
+            Log.d("AddressLog", "Fetched address: $address")
+            Log.d("ST_DistanceTest", "stDistanceTest: $stDistanceTest")
+            Log.d("MakePolygonTest", "MakePolygonTest: $makePolygonTest")
+            Log.d("SpatiaLiteLog", "SpatiaLite Version: $spatiaVersion")
+            Log.d("NearbyAddresses", "NearbyAddresses: $getNearbyAddresses")
             withContext(Dispatchers.Main) {
-                spatia_version?.text = spatiaVersion
+                // Manually construct the JSON string
+                val addressJson = """
+                                    {
+                                        "id": ${address.id},
+                                        "country": ${address.country?.let { "\"$it\"" } ?: "null"},
+                                        "city": ${address.city?.let { "\"$it\"" } ?: "null"},
+                                        "postcode": ${address.postcode?.let { "\"$it\"" } ?: "null"},
+                                        "wheelchair": ${address.wheelchair?.let { "\"$it\"" } ?: "null"},
+                                        "street": ${address.street?.let { "\"$it\"" } ?: "null"},
+                                        "housename": ${address.housename?.let { "\"$it\"" } ?: "null"},
+                                        "housenumber": ${address.housenumber?.let { "\"$it\"" } ?: "null"},
+                                        "geometry": {
+                                            "x": ${address.geometry?.x ?: "null"},
+                                            "y": ${address.geometry?.y ?: "null"},
+                                            "srid": ${address.geometry?.srid ?: "null"}
+                                        }
+                                    }
+                                """.trimIndent()
+                pt_address?.text = addressJson
             }
 
         }

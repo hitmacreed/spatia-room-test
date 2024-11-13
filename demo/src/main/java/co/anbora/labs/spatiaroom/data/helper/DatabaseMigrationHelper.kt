@@ -7,20 +7,18 @@ object DatabaseMigrationHelper {
         db.query("SELECT InitSpatialMetaData();").moveToNext()
     }
 
-    fun createNewAmenityTable(db: SupportSQLiteDatabase) {
+    fun createNewAddressesTable(db: SupportSQLiteDatabase) {
         db.execSQL("""
-            CREATE TABLE "amenity_internet_cafe_lisboa_2_new" (
-                "ogc_fid" INTEGER, 
-                "full_id" TEXT, 
-                "osm_id" TEXT, 
-                "osm_type" TEXT, 
-                "amenity" TEXT, 
-                "wheelchair" TEXT, 
-                "opening_hours" TEXT, 
-                "name" TEXT, 
-                "internet_access" TEXT, 
-                "GEOMETRY" BLOB, 
-                PRIMARY KEY("ogc_fid")
+            CREATE TABLE "pt_addresses_2_new" (
+                "id" INTEGER, 
+                "country" TEXT, 
+                "city" TEXT, 
+                "postcode" TEXT, 
+                "street" TEXT, 
+                "housename" TEXT, 
+                "housenumber" TEXT, 
+                "Geometry" BLOB, 
+                PRIMARY KEY("id")
             )
         """)
     }
@@ -28,8 +26,8 @@ object DatabaseMigrationHelper {
     fun addGeometryColumn(db: SupportSQLiteDatabase) {
         db.query("""
             SELECT AddGeometryColumn(
-                'amenity_internet_cafe_lisboa_2_new', 
-                'GEOMETRY', 
+                'pt_addresses_2_new', 
+                'Geometry', 
                 4326, 
                 'POINT', 
                 'XY'
@@ -40,30 +38,29 @@ object DatabaseMigrationHelper {
     fun createSpatialIndex(db: SupportSQLiteDatabase) {
         db.query("""
             SELECT CreateSpatialIndex(
-                'amenity_internet_cafe_lisboa_2_new', 
-                'GEOMETRY'
+                'pt_addresses_2_new', 
+                'Geometry'
             );
         """).moveToNext()
     }
 
-    fun migrateDataFromOldTable(db: SupportSQLiteDatabase) {
+    fun migrateDataFromOriginalTable(db: SupportSQLiteDatabase) {
         db.execSQL("""
-            INSERT INTO "amenity_internet_cafe_lisboa_2_new" 
-            SELECT "ogc_fid", "full_id", "osm_id", "osm_type", "amenity", "wheelchair", 
-                   "opening_hours", "name", "internet_access", "GEOMETRY" 
-            FROM "amenity_internet_cafe_lisboa"
+            INSERT INTO "pt_addresses_2_new" 
+            SELECT "id", "country", "city", "postcode", "street", "housename", "housenumber", "Geometry" 
+            FROM "pt_addresses"
         """)
     }
 
     fun dropOldTables(db: SupportSQLiteDatabase) {
-        db.execSQL("DROP TABLE IF EXISTS `amenity_internet_cafe_lisboa`")
-        db.execSQL("DROP TABLE IF EXISTS `amenity_internet_cafe_lisboa_2`")
+        db.execSQL("DROP TABLE IF EXISTS `pt_addresses`")
+        db.execSQL("DROP TABLE IF EXISTS `pt_addresses_cp`")
     }
 
     fun renameNewTable(db: SupportSQLiteDatabase) {
         db.execSQL("""
-            ALTER TABLE "amenity_internet_cafe_lisboa_2_new" 
-            RENAME TO "amenity_internet_cafe_lisboa_2"
+            ALTER TABLE "pt_addresses_2_new" 
+            RENAME TO "pt_addresses_cp"
         """)
     }
 }
