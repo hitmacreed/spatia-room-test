@@ -29,8 +29,6 @@ class MainFragment : Fragment() {
     val job = Job()
     val uiScope = CoroutineScope(Dispatchers.Main + job)
 
-    private val viewModel: MainViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

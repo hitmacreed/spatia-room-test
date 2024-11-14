@@ -3,8 +3,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 object DatabaseMigrationHelper {
 
-    // databaseName_temp = temporary DB
-    // databaseName_cp = copy of original DB
+    // databaseTable_temp = temporary table
+    // databaseTable_cp = copy of original table
 
     fun initializeSpatialMetaData(db: SupportSQLiteDatabase) {
         db.query("SELECT InitSpatialMetaData();").moveToNext()

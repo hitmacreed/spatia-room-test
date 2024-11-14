@@ -82,8 +82,8 @@ interface AddressesDao {
     FROM ${PtAddresses.TABLE_ADDRESSES_ENTITY} address
     WHERE ST_Distance(
                address.Geometry,
-               MakePoint(-9.1395, 38.7223, 4326)  -- Lisbon location coordinates
-           ) <= 50000 Limit 20;  -- 50 km in meters and limit to 20
+               MakePoint(-9.1395, 38.7223, 4326)) <= 50000   -- Lisbon location coordinates  &&  -- 50 km in meters and limit to 20
+   Limit 20;
     """
     )
     @SkipQueryVerification
