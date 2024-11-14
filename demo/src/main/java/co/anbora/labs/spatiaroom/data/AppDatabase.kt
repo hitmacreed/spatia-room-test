@@ -10,13 +10,15 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import co.anbora.labs.spatia.builder.SpatiaRoom
 import co.anbora.labs.spatia.geometry.GeometryConverters
 import co.anbora.labs.spatiaroom.data.dao.AddressesDao
+import co.anbora.labs.spatiaroom.data.dao.AmenityDao
 import co.anbora.labs.spatiaroom.data.helper.DatabaseMigrationHelper
 import co.anbora.labs.spatiaroom.data.model.PtAddresses
+import co.anbora.labs.spatiaroom.data.model.PtAmenity
 import java.io.File
 
 
 @Database(
-    entities = [PtAddresses::class],
+    entities = [PtAddresses::class, PtAmenity::class],
     version = 1,
     //exportSchema = false
 )
@@ -24,9 +26,14 @@ import java.io.File
 abstract class AppDatabase : RoomDatabase() {
 
     /**
-     * @return [AddressesDao] Foodium Posts Data Access Object.
+     * @return [AddressesDao]   Data Access Object.
      */
     abstract fun addresses(): AddressesDao
+
+    /**
+     * @return [AmenityDao]   Data Access Object.
+     */
+    abstract fun amenity(): AmenityDao
 
     companion object {
         const val DB_NAME = "lisbonSpatiaLite.sqlite";
@@ -82,14 +89,13 @@ abstract class AppDatabase : RoomDatabase() {
                             db.beginTransaction()
                             try {
                                 // Initialize metadata spatialite
-                                db.query("SELECT InitSpatialMetaData();").moveToNext()
-                                DatabaseMigrationHelper.createNewAddressesTable(db)
+                                DatabaseMigrationHelper.initializeSpatialMetaData(db)
+                                DatabaseMigrationHelper.createNewTables(db)
                                 DatabaseMigrationHelper.addGeometryColumn(db)
                                 DatabaseMigrationHelper.createSpatialIndex(db)
                                 DatabaseMigrationHelper.migrateDataFromOriginalTable(db)
                                 DatabaseMigrationHelper.dropOldTables(db)
                                 DatabaseMigrationHelper.renameNewTable(db)
-
                                 } finally {
                                 db.setTransactionSuccessful()
                             }

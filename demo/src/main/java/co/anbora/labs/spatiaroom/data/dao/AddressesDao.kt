@@ -53,7 +53,7 @@ interface AddressesDao {
      * @return  [PtAddresses] from database table.
      */
     @Query("SELECT *, ST_AsText(geometry) AS coordinates " +
-            "FROM ${PtAddresses.TABLE_NAME_ENTITY} " +
+            "FROM ${PtAddresses.TABLE_ADDRESSES_ENTITY} " +
             "WHERE LOWER(city) = LOWER(:city) AND LOWER(street) = LOWER(:street) Limit 10")
     @SkipQueryVerification
     fun getAddressesByCityAndStreet(city: String, street: String): PtAddresses
@@ -71,19 +71,21 @@ interface AddressesDao {
      *
      * @return A list of addresses within a 50 km radius from Lisbon, including the distance to each address in meters.
      */
-    @Query("""
-    SELECT a.id, a.country, a.city, a.street, a.housename, a.housenumber,
-           AsText(a.Geometry) AS address_coordinates,
+    @Query(
+        """
+    SELECT address.id,address.country, address.city, address.street, address.housename, address.housenumber,
+           AsText(address.Geometry) AS address_coordinates,
            ST_Distance(
-               a.Geometry,  -- Address coordinates from pt_addresses table
+               address.Geometry,  -- Address coordinates from pt_addresses table
                MakePoint(-9.1395, 38.7223, 4326)  -- Lisbon location coordinates
            ) AS distance
-    FROM ${PtAddresses.TABLE_NAME_ENTITY} a
+    FROM ${PtAddresses.TABLE_ADDRESSES_ENTITY} address
     WHERE ST_Distance(
-               a.Geometry,
+               address.Geometry,
                MakePoint(-9.1395, 38.7223, 4326)  -- Lisbon location coordinates
            ) <= 50000 Limit 20;  -- 50 km in meters and limit to 20
-    """)
+    """
+    )
     @SkipQueryVerification
     fun getNearbyAddresses(): List<PtAddresses>
 

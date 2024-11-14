@@ -28,42 +28,29 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import co.anbora.labs.spatia.geometry.Point
-import co.anbora.labs.spatiaroom.data.model.PtAddresses.Companion.TABLE_ADDRESSES_ENTITY
+import co.anbora.labs.spatiaroom.data.model.PtAmenity.Companion.TABLE_AMENITY_ENTITY
+
 
 /**
  * Data class for Database entity and Serialization.
  */
-@Entity(tableName = TABLE_ADDRESSES_ENTITY)
-data class PtAddresses(
+@Entity(tableName = TABLE_AMENITY_ENTITY)
+data class PtAmenity(
 
     @PrimaryKey
     @ColumnInfo(name = "id")
     var id: Long?,
 
-    @ColumnInfo(name = "country")
-    var country: String? = null,
+    @ColumnInfo(name = "sub_type")
+    var subType: String?,
 
-    @ColumnInfo(name = "city")
-    var city: String?,
-
-    @ColumnInfo(name = "postcode")
-    var postcode: String?,
-
-    var wheelchair : String?,
-
-    @ColumnInfo(name = "street")
-    var street: String?,
-
-    @ColumnInfo(name = "housename")
-    var housename: String?,
-
-    @ColumnInfo(name = "housenumber")
-    var housenumber: String?,
+    @ColumnInfo(name = "name")
+    var name: String?,
 
     @ColumnInfo(name = "Geometry")
     var geometry: Point?,
 ) {
     companion object {
-        const val TABLE_ADDRESSES_ENTITY = "pt_addresses_cp"
+        const val TABLE_AMENITY_ENTITY = "pt_amenity_cp"
     }
 }

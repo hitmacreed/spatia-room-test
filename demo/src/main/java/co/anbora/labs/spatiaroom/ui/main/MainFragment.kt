@@ -52,12 +52,14 @@ class MainFragment : Fragment() {
             val stDistanceTest = appDatabase.addresses().stDistanceTest()
             val makePolygonTest = appDatabase.addresses().makePolygonTest()
             val getNearbyAddresses = appDatabase.addresses().getNearbyAddresses()
-            // Log the fetched address and spatialite version
+            val getNearbyHospitals = appDatabase.amenity().getNearbyHospitals()
+            // Log the fetched data
             Log.d("AddressLog", "Fetched address: $address")
             Log.d("ST_DistanceTest", "stDistanceTest: $stDistanceTest")
             Log.d("MakePolygonTest", "MakePolygonTest: $makePolygonTest")
             Log.d("SpatiaLiteLog", "SpatiaLite Version: $spatiaVersion")
             Log.d("NearbyAddresses", "NearbyAddresses: $getNearbyAddresses")
+            Log.d("getNearbyHospitals", "getNearbyHospitals: $getNearbyHospitals")
             withContext(Dispatchers.Main) {
                 // Manually construct the JSON string
                 val addressJson = """
