@@ -77,7 +77,6 @@ abstract class AppDatabase : RoomDatabase() {
                 throw IllegalStateException("Database file not found.")
             }
 
-
             synchronized(this) {
                 val instance = SpatiaRoom.databaseBuilder(
                     context.applicationContext,
@@ -99,7 +98,6 @@ abstract class AppDatabase : RoomDatabase() {
                                 } finally {
                                 db.setTransactionSuccessful()
                             }
-
                             db.endTransaction()
                         }
                     })
